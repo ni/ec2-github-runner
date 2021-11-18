@@ -15,6 +15,7 @@ class Config {
       ec2InstanceId: core.getInput('ec2-instance-id'),
       iamRoleName: core.getInput('iam-role-name'),
       runnerHomeDir: core.getInput('runner-home-dir'),
+      ec2LaunchTemplate: core.getInput('ec2-launch-template'),
       githubRegistrationTimeout: core.getInput('github-registration-timeout'),
     };
 
@@ -49,7 +50,11 @@ class Config {
     }
 
     if (this.input.mode === 'start') {
-      if (!this.input.ec2ImageId || !this.input.ec2InstanceType || !this.input.subnetId || !this.input.securityGroupId || !this.input.ec2BaseOs) {
+      const isSet = param => param;
+      const instanceParams = [this.input.ec2ImageId, this.input.ec2InstanceType, this.input.ec2BaseOs, this.input.subnetId, this.input.securityGroupId];
+      const templateParams = [this.input.ec2LaunchTemplate, this.input.ec2BaseOs];
+
+      if (!(instanceParams.every(isSet) || templateParams.every(isSet) )) {
         throw new Error(`Not all the required inputs are provided for the 'start' mode`);
       }
 
