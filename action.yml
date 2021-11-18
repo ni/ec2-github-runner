@@ -78,6 +78,11 @@ inputs:
      description: >-
        EC2 launch template name. A launch template can be used to specify AMI, instance type etc parameters.
      required: false
+  github-registration-timeout:
+    description: >-
+      Minutes to wait for GitHub runner registration before failing the start.
+    required: false
+    default: '5'
 outputs:
   label:
     description: >-
