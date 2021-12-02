@@ -214,7 +214,7 @@ We recommend using [aws-actions/configure-aws-credentials](https://github.com/aw
 | `label`                                                                                                                                                                      | Name of the unique label assigned to the runner. <br><br> The label is used in two cases: <br> - to use as the input of `runs-on` property for the following jobs; <br> - to remove the runner from GitHub when it is not needed anymore. |
 | `ec2-instance-id`                                                                                                                                                            | EC2 Instance Id of the created runner. <br><br> The id is used to terminate the EC2 instance when the runner is not needed anymore.                                                                                                       |
 
-### Example
+### Examples
 
 The workflow showed in the picture above and declared in `do-the-job.yml` looks like this:
 
@@ -237,12 +237,13 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Start EC2 runner
         id: start-ec2-runner
-        uses: machulav/ec2-github-runner@v2
+        uses: ni/ec2-github-runner@main
         with:
           mode: start
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           ec2-image-id: ami-123
           ec2-instance-type: t3.nano
+          ec2-base-os: linux-x64
           subnet-id: subnet-123
           security-group-id: sg-123
           iam-role-name: my-role-name # optional, requires additional permissions
@@ -273,7 +274,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
       - name: Stop EC2 runner
-        uses: machulav/ec2-github-runner@v2
+        uses: ni/ec2-github-runner@main
         with:
           mode: stop
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
@@ -281,19 +282,30 @@ jobs:
           ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
 ```
 
-### Real user examples
+#### Using launch templates
 
-In [this discussion](https://github.com/machulav/ec2-github-runner/discussions/19), you can find feedback and examples from the users of the action.
+```yml
+steps:
+...
+- name: Start EC2 runner
+  id: start-ec2-runner
+  uses: ni/ec2-github-runner@main
+  with:
+    mode: start
+    github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+    github-registration-timeout: 10
+    ec2-base-os: win-x64
+    ec2-launch-template: my-launch-template-name
+...
+```
 
-If you use this action in your workflow, feel free to add your story there as well 🙌
 
 ## Self-hosted runner security with public repositories
 
-> We recommend that you do not use self-hosted runners with public repositories.
->
-> Forks of your public repository can potentially run dangerous code on your self-hosted runner machine by creating a pull request that executes the code in a workflow.
+GitHub recommend that you do not use self-hosted runners with public repositories. Forks of your public repository can potentially run dangerous code on your self-hosted runner machine by creating a pull request that executes the code in a workflow.
+To avoid untrusted workflows running on your self-hosted runner automatically, please make sure your apply the right action permissions in your repository settings based on the [GitHub documentation](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/enabling-features-for-your-repository/managing-github-actions-settings-for-a-repository).
 
-Please find more details about this security note on [GitHub documentation](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners#self-hosted-runner-security-with-public-repositories).
+> Please find more details about this security note on [GitHub documentation](https://docs.github.com/en/free-pro-team@latest/actions/hosting-your-own-runners/about-self-hosted-runners#self-hosted-runner-security-with-public-repositories).
 
 ## License Summary
 
