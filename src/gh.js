@@ -32,7 +32,7 @@ async function getRegistrationToken() {
 }
 
 async function removeRunner() {
-  for (var i = 1; i <= parseInt(config.input.numberOfRunners); i++) {
+  do {
     const runner = await getRunner(config.input.label);
     const octokit = github.getOctokit(config.input.githubToken);
 
@@ -49,7 +49,7 @@ async function removeRunner() {
       core.error('GitHub self-hosted runner removal error');
       throw error;
     }
-  }
+  } while (runner);
 }
 
 async function waitForRunnerRegistered(label) {
