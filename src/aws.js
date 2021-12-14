@@ -53,6 +53,10 @@ function buildUserDataScript(githubRegistrationToken, label) {
     core.error('Not supported ec2-base-os.');
   }
   
+  userData.forEach(element => {
+    core.info(element);
+  });
+
   return userData;
 }
 
