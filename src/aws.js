@@ -17,8 +17,8 @@ function buildUserDataScript(githubRegistrationToken, label) {
     
     for (var i = 1; i <= parseInt(config.input.numberOfRunners); i++){
       userData.push(
-        `mkdir ${i} && cd ${i}`,
-        `Expand-Archive -Path c:/actions-runner/actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.zip -DestinationPath $PWD`,
+        `mkdir ${i}; cd ${i}`,
+        `Expand-Archive -Path ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.zip -DestinationPath $PWD`,
         'mkdir _work',
         `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${i} --token ${githubRegistrationToken} --labels ${label} --unattended --runasservice`,
         'cd ..',
