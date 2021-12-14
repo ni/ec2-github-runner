@@ -15,11 +15,9 @@ function buildUserDataScript(githubRegistrationToken, label) {
       `Invoke-WebRequest -Uri https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.zip -OutFile actions-runner-win-x64-${runnerVersion}.zip`,
     );
     
-    core.info('before');
     for (var i = 1; i <= parseInt(config.input.numberOfRunners); i++){
-      core.info(i);
       userData.push(
-        `mkdir ${i} && cd ${i}`
+        `mkdir ${i} && cd ${i}`,
         `Expand-Archive -Path ../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.zip -DestinationPath $PWD`,
         'mkdir _work',
         `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${i} --token ${githubRegistrationToken} --labels ${label} --unattended --runasservice`,
@@ -42,7 +40,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
 
     for (var i = 1; i <= parseInt(config.input.numberOfRunners); i++) {
       userData.push(
-        `mkdir ${i} && cd ${i}`
+        `mkdir ${i} && cd ${i}`,
         `tar xzf ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
         `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${i} --token ${githubRegistrationToken} --labels ${label}`,
         'mkdir _work',
