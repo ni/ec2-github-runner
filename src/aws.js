@@ -38,7 +38,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
       'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1',
     );
 
-    for (var i = 1; i <= parseInt(config.input.numberOfRunners); i++) {
+    for (i = 1; i <= parseInt(config.input.numberOfRunners); i++) {
       userData.push(
         `mkdir ${i} && cd ${i}`,
         `tar xzf ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
