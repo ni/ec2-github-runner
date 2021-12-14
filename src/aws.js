@@ -43,7 +43,6 @@ function buildUserDataScript(githubRegistrationToken, label) {
         `mkdir ${i} && cd ${i}`,
         `tar xzf ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
         `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${i} --token ${githubRegistrationToken} --labels ${label}`,
-        'mkdir _work',
         'sudo ./svc.sh install',
         'sudo ./svc.sh start',
         'cd ..',
@@ -52,10 +51,6 @@ function buildUserDataScript(githubRegistrationToken, label) {
   } else {
     core.error('Not supported ec2-base-os.');
   }
-  
-  userData.forEach(element => {
-    core.info(element);
-  });
 
   return userData;
 }
