@@ -15,7 +15,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
       `Invoke-WebRequest -Uri https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.zip -OutFile actions-runner-win-x64-${runnerVersion}.zip`,
     );
     
-    for (var i = 1; i <= parseInt(config.input.numberOfRunners); i++){
+    for (var i = 1; i <= parseInt(config.input.numberOfRunners); i++) {
       userData.push(
         `mkdir ${i}; cd ${i}`,
         `Expand-Archive -Path ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.zip -DestinationPath $PWD`,
