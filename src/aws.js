@@ -2,7 +2,7 @@ const AWS = require('aws-sdk');
 const core = require('@actions/core');
 const config = require('./config');
 
-const runnerVersion = '2.283.2'
+const runnerVersion = '2.285.1'
 
 // User data scripts are run as the root user
 function buildUserDataScript(githubRegistrationToken, label) {
@@ -32,7 +32,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
   else if (config.input.ec2BaseOs === 'linux-x64' || config.input.ec2BaseOs === 'linux-arm' || config.input.ec2BaseOs === 'linux-arm64'){
     userData.push(
       '#!/bin/bash',
-      'mkdir -m 777 actions-runner && cd actions-runner',
+      'mkdir actions-runner && cd actions-runner',
       `curl -O -L https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
       'export RUNNER_ALLOW_RUNASROOT=1',
       'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1',
@@ -43,8 +43,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
         `mkdir ${i} && cd ${i}`,
         `tar xzf ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
         `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${i} --token ${githubRegistrationToken} --labels ${label}`,
-        'sudo ./svc.sh install',
-        'sudo ./svc.sh start',
+        './run.sh &',
         'cd ..',
       );
     }
