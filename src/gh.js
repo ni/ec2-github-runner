@@ -49,7 +49,7 @@ async function removeRunner() {
       core.error('GitHub self-hosted runner removal error');
       throw error;
     }
-  } while (runner);
+  } while (await getRunner(config.input.label));
 }
 
 async function waitForRunnerRegistered(label) {
