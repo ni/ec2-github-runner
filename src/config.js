@@ -25,11 +25,7 @@ class Config {
     tags.push({"Key":"GITHUB_RUN_NUMBER","Value":github.context.runNumber.toString()});
     tags.push({"Key":"GITHUB_WORKFLOW","Value":github.context.workflow});
     tags.push({"Key":"GITHUB_REPOSITORY","Value":github.context.repo.repo});
-
-    this.tagSpecifications = null;
-    if (tags.length > 0) {
-      this.tagSpecifications = [{ResourceType: 'instance', Tags: tags}, {ResourceType: 'volume', Tags: tags}];
-    }
+    this.tagSpecifications = [{ResourceType: 'instance', Tags: tags}, {ResourceType: 'volume', Tags: tags}];
 
     // the values of github.context.repo.owner and github.context.repo.repo are taken from
     // the environment variable GITHUB_REPOSITORY specified in "owner/repo" format and
