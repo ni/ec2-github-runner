@@ -21,7 +21,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
         `Expand-Archive -Path ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.zip -DestinationPath $PWD`,
         'mkdir _work',
         `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${i} --token ${githubRegistrationToken} --labels ${label} --unattended`,
-        './run.cmd',
+        'Start-Process -FilePath ./run.cmd',
         'cd ..',
       );
     }
