@@ -22,6 +22,9 @@ class Config {
     const tags = JSON.parse(core.getInput('aws-resource-tags'));
     tags.push({"Key":"Name","Value":"ec2-github-runner"});
     tags.push({"Key":"GITHUB_RUN_ID","Value":github.context.runId.toString()});
+    tags.push({"Key":"GITHUB_RUN_NUMBER","Value":github.context.runNumber.toString()});
+    tags.push({"Key":"GITHUB_WORKFLOW","Value":github.context.workflow});
+    tags.push({"Key":"GITHUB_REPOSITORY","Value":github.context.repo.repo});
 
     this.tagSpecifications = null;
     if (tags.length > 0) {
