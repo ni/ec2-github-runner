@@ -20,6 +20,8 @@ class Config {
     };
 
     const tags = JSON.parse(core.getInput('aws-resource-tags'));
+    tags.push({"Key":"Name","Value":"test"});
+
     this.tagSpecifications = null;
     if (tags.length > 0) {
       this.tagSpecifications = [{ResourceType: 'instance', Tags: tags}, {ResourceType: 'volume', Tags: tags}];
