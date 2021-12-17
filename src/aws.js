@@ -100,12 +100,12 @@ async function startEc2Instance(label, githubRegistrationToken) {
   const ec2InstanceIds = []
 
   for (let i = 1; i <= parseInt(config.input.numberOfInstances); i++) {
-    let userData = buildUserDataScript(githubRegistrationToken, label, i);
+    const userData = buildUserDataScript(githubRegistrationToken, label, i);
     params.UserData = Buffer.from(userData.join('\n')).toString('base64');
 
     try {
-      let result = await ec2.runInstances(params).promise();
-      let ec2InstanceId = result.Instances[0].InstanceId
+      const result = await ec2.runInstances(params).promise();
+      const ec2InstanceId = result.Instances[0].InstanceId
       ec2InstanceIds.push(ec2InstanceId);
       core.info(`AWS EC2 instance ${ec2InstanceId} is started`);  
     } catch (error) {
