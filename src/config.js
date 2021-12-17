@@ -14,7 +14,7 @@ class Config {
       label: core.getInput('label'),
       ec2InstanceId: core.getInput('ec2-instance-id'),
       iamRoleName: core.getInput('iam-role-name'),
-      runnerHomeDir: core.getInput('runner-home-dir'),
+      numberOfRunners: core.getInput('number-of-runners'),
       ec2LaunchTemplate: core.getInput('ec2-launch-template'),
       githubRegistrationTimeout: core.getInput('github-registration-timeout'),
     };
@@ -50,6 +50,10 @@ class Config {
 
     if (isNaN(parseInt(this.input.githubRegistrationTimeout))) {
       throw new Error(`The 'github-registration-timeout' input is not an integer`);
+    }
+
+    if (isNaN(parseInt(this.input.numberOfRunners))) {
+      throw new Error(`The 'number-of-runners' input is not an integer`);
     }
 
     if (this.input.mode === 'start') {
