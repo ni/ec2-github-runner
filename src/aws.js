@@ -5,7 +5,7 @@ const config = require('./config');
 const runnerVersion = '2.285.1'
 
 // User data scripts are run as the root user
-function buildUserDataScript(githubRegistrationToken, label) {
+function buildUserDataScript(githubRegistrationToken, label, instance) {
   const userData = [];
 
   if (config.input.ec2BaseOs === 'win-x64') {
@@ -20,7 +20,8 @@ function buildUserDataScript(githubRegistrationToken, label) {
         `mkdir ${i}; cd ${i}`,
         `Expand-Archive -Path ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.zip -DestinationPath $PWD`,
         'mkdir _work',
-        `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${i} --token ${githubRegistrationToken} --labels ${label} --unattended --runasservice`,
+        `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${instance}-${i} --token ${githubRegistrationToken} --labels ${label} --unattended`,
+        'Start-Process -FilePath ./run.cmd',
         'cd ..',
       );
     }
@@ -42,7 +43,7 @@ function buildUserDataScript(githubRegistrationToken, label) {
       userData.push(
         `mkdir ${i} && cd ${i}`,
         `tar xzf ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
-        `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${i} --token ${githubRegistrationToken} --labels ${label}`,
+        `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${instance}-${i} --token ${githubRegistrationToken} --labels ${label}`,
         './run.sh &',
         'cd ..',
       );
@@ -57,12 +58,11 @@ function buildUserDataScript(githubRegistrationToken, label) {
 async function startEc2Instance(label, githubRegistrationToken) {
   const ec2 = new AWS.EC2();
 
-  const userData = buildUserDataScript(githubRegistrationToken, label);
+  
 
   const params = {
     MinCount: 1,
     MaxCount: 1,
-    UserData: Buffer.from(userData.join('\n')).toString('base64'),
   };
 
   if (config.input.ec2LaunchTemplate) {
@@ -97,47 +97,56 @@ async function startEc2Instance(label, githubRegistrationToken) {
     params.TagSpecifications = config.tagSpecifications;
   }
 
-  try {
-    const result = await ec2.runInstances(params).promise();
-    const ec2InstanceId = result.Instances[0].InstanceId;
-    core.info(`AWS EC2 instance ${ec2InstanceId} is started`);
-    return ec2InstanceId;
-  } catch (error) {
-    core.error('AWS EC2 instance starting error');
-    throw error;
+  const ec2InstanceIds = []
+
+  for (let i = 1; i <= parseInt(config.input.numberOfInstances); i++) {
+    const userData = buildUserDataScript(githubRegistrationToken, label, i);
+    params.UserData = Buffer.from(userData.join('\n')).toString('base64');
+
+    try {
+      const result = await ec2.runInstances(params).promise();
+      const ec2InstanceId = result.Instances[0].InstanceId
+      ec2InstanceIds.push(ec2InstanceId);
+      core.info(`AWS EC2 instance ${ec2InstanceId} is started`);  
+    } catch (error) {
+      core.error('AWS EC2 instance starting error');
+      throw error;
+    }
   }
+
+  return ec2InstanceIds;
 }
 
 async function terminateEc2Instance() {
   const ec2 = new AWS.EC2();
 
   const params = {
-    InstanceIds: [config.input.ec2InstanceId],
+    InstanceIds: config.input.ec2InstanceIds,
   };
 
   try {
     await ec2.terminateInstances(params).promise();
-    core.info(`AWS EC2 instance ${config.input.ec2InstanceId} is terminated`);
+    core.info(`AWS EC2 instances ${config.input.ec2InstanceIds} are terminated`);
     return;
   } catch (error) {
-    core.error(`AWS EC2 instance ${config.input.ec2InstanceId} termination error`);
+    core.error(`AWS EC2 instances ${config.input.ec2InstanceIds} termination error`);
     throw error;
   }
 }
 
-async function waitForInstanceRunning(ec2InstanceId) {
+async function waitForInstanceRunning(ec2InstanceIds) {
   const ec2 = new AWS.EC2();
 
   const params = {
-    InstanceIds: [ec2InstanceId],
+    InstanceIds: ec2InstanceIds,
   };
 
   try {
     await ec2.waitFor('instanceRunning', params).promise();
-    core.info(`AWS EC2 instance ${ec2InstanceId} is up and running`);
+    core.info(`AWS EC2 instance ${ec2InstanceIds} are up and running`);
     return;
   } catch (error) {
-    core.error(`AWS EC2 instance ${ec2InstanceId} initialization error`);
+    core.error(`AWS EC2 instances ${ec2InstanceIds} initialization error`);
     throw error;
   }
 }

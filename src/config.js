@@ -12,15 +12,15 @@ class Config {
       subnetId: core.getInput('subnet-id'),
       securityGroupId: core.getInput('security-group-id'),
       label: core.getInput('label'),
-      ec2InstanceId: core.getInput('ec2-instance-id'),
+      ec2InstanceIds: JSON.parse(core.getInput('ec2-instance-ids')),
       iamRoleName: core.getInput('iam-role-name'),
       numberOfRunners: core.getInput('number-of-runners'),
+      numberOfInstances: core.getInput('number-of-instances'),
       ec2LaunchTemplate: core.getInput('ec2-launch-template'),
       githubRegistrationTimeout: core.getInput('github-registration-timeout'),
     };
 
     const tags = JSON.parse(core.getInput('aws-resource-tags'));
-    // Include some environment tags for easier identification.
     tags.push({"Key":"Name","Value":"ec2-github-runner"});
     tags.push({"Key":"GITHUB_RUN_ID","Value":github.context.runId.toString()});
     tags.push({"Key":"GITHUB_RUN_NUMBER","Value":github.context.runNumber.toString()});
@@ -56,6 +56,10 @@ class Config {
       throw new Error(`The 'number-of-runners' input is not an integer`);
     }
 
+    if (isNaN(parseInt(this.input.numberOfInstances))) {
+      throw new Error(`The 'number-of-instances' input is not an integer`);
+    }
+
     if (this.input.mode === 'start') {
       const isSet = param => param;
       const instanceParams = [this.input.ec2ImageId, this.input.ec2InstanceType, this.input.ec2BaseOs, this.input.subnetId, this.input.securityGroupId];
@@ -69,7 +73,7 @@ class Config {
         throw new Error(`Wrong base-os. Allowed values: win-x64, linux-x64, linux-arm or linux-arm64.`);
       }
     } else if (this.input.mode === 'stop') {
-      if (!this.input.label || !this.input.ec2InstanceId) {
+      if (!this.input.label || !this.input.ec2InstanceIds) {
         throw new Error(`Not all the required inputs are provided for the 'stop' mode`);
       }
     } else {
