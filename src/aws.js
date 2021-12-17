@@ -43,8 +43,8 @@ function buildUserDataScript(githubRegistrationToken, label) {
       userData.push(
         `mkdir ${i} && cd ${i}`,
         `tar xzf ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
-        `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${i} --token ${githubRegistrationToken} --labels ${label}`,
-        './run.sh &',
+        `su ec2-user -c './config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${i} --token ${githubRegistrationToken} --labels ${label}'`,
+        `su ec2-user -c './run.sh &'`,
         'cd ..',
       );
     }
