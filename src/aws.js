@@ -33,6 +33,7 @@ function buildUserDataScript(githubRegistrationToken, label, instance) {
   else if (config.input.ec2BaseOs === 'linux-x64' || config.input.ec2BaseOs === 'linux-arm' || config.input.ec2BaseOs === 'linux-arm64'){
     userData.push(
       '#!/bin/bash',
+      'su - ec2-user',
       'mkdir actions-runner && cd actions-runner',
       `curl -O -L https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
       'export RUNNER_ALLOW_RUNASROOT=1',
