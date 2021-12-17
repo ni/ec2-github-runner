@@ -193,6 +193,7 @@ Now you're ready to go!
 | `iam-role-name`                                                                                                                                                              | Optional. Used only with the `start` mode. | IAM role name to attach to the created EC2 runner. <br><br> This allows the runner to have permissions to run additional actions within the AWS account, without having to manage additional GitHub secrets and AWS users. <br><br> Setting this requires additional AWS permissions for the role launching the instance (see above). |
 | `aws-resource-tags`                                                                                                                                                          | Optional. Used only with the `start` mode. | Specifies tags to add to the EC2 instance and any attached storage. <br><br> This field is a stringified JSON array of tag objects, each containing a `Key` and `Value` field (see example below). <br><br> Setting this requires additional AWS permissions for the role launching the instance (see above).                         |
 | `number-of-runners`                                                                                                                                                          | Optional. Used only with the `start` mode. | Number of GitHub runner processes started on the created instance. Default is `1`.<br><br> |
+| `number-of-instances`                                                                                                                                                        | Optional. Used only with the `start` mode. | Number of EC2 instances started. Can be combined with `number-of-runners`. Default is `1`.<br><br> |
 | `ec2-launch-template`                                                                                                                                                        | Optional. Used only with the `start` mode. | Specifies an existing EC2 launch template (by name), which can be used to define image ID, instance type, subnet ID, security group IDs etc. Values in the launch template specified can be overridden with values, eg.: When ec2-image-id specified, it will override the one from launch template.<br><br> |
 | `github-registration-timeout`                                                                                                                                                | Optional. Used only with the `start` mode. | Minutes to wait for GitHub runner registration before failing the start. Default is `5`.<br><br> |
 
@@ -227,7 +228,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       label: ${{ steps.start-ec2-runner.outputs.label }}
-      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-id }}
+      ec2-instance-id: ${{ steps.start-ec2-runner.outputs.ec2-instance-ids }}
     steps:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -279,7 +280,7 @@ jobs:
           mode: stop
           github-token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           label: ${{ needs.start-runner.outputs.label }}
-          ec2-instance-id: ${{ needs.start-runner.outputs.ec2-instance-id }}
+          ec2-instance-ids: ${{ needs.start-runner.outputs.ec2-instance-ids }}
 ```
 
 #### Using launch templates
