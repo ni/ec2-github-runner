@@ -33,19 +33,19 @@ function buildUserDataScript(githubRegistrationToken, label, instance) {
   else if (config.input.ec2BaseOs === 'linux-x64' || config.input.ec2BaseOs === 'linux-arm' || config.input.ec2BaseOs === 'linux-arm64'){
     userData.push(
       '#!/bin/bash',
-      'su ec2-user bash -c "mkdir actions-runner && cd actions-runner"',
-      `su ec2-user bash -c "curl -O -L https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz"`,
-      'su ec2-user bash -c "export RUNNER_ALLOW_RUNASROOT=1"',
-      'su ec2-user bash -c "export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1"',
+      'mkdir actions-runner && cd actions-runner',
+      `curl -O -L https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
+      'export RUNNER_ALLOW_RUNASROOT=1',
+      'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1',
     );
 
     for (let i = 1; i <= parseInt(config.input.numberOfRunners); i++) {
       userData.push(
-        `su ec2-user bash -c "mkdir ${i} && cd ${i}"`,
-        `su ec2-user bash -c "tar xzf ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz"`,
-        `su ec2-user bash -c "./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${instance}-${i} --token ${githubRegistrationToken} --labels ${label}"`,
-        'su ec2-user bash -c "./run.sh &"',
-        'su ec2-user bash -c "cd .."',
+        `mkdir ${i} && cd ${i}`,
+        `tar xzf ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
+        `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${instance}-${i} --token ${githubRegistrationToken} --labels ${label}`,
+        'su ec2-user -c \'./run.sh & \'',
+        'cd ..',
       );
     }
   } else {
