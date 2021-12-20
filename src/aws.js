@@ -45,7 +45,7 @@ function buildUserDataScript(githubRegistrationToken, label, instance) {
         `tar xzf ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
         `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${instance}-${i} --token ${githubRegistrationToken} --labels ${label}`,
         'chmod -R 777 /actions-runner/${i}', 
-        'su - ec2-user -c \'./run.sh & \'',
+        'su ec2-user -c \'./run.sh & \'',
         'cd ..',
       );
     }
