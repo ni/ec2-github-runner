@@ -21,7 +21,7 @@ function buildUserDataScript(githubRegistrationToken, label, instance) {
         `Expand-Archive -Path ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.zip -DestinationPath $PWD`,
         'mkdir _work',
         `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${instance}-${i} --token ${githubRegistrationToken} --labels ${label} --unattended`,
-        'Start-Process Powershell -Argumentlist \'-ExecutionPolicy Bypass -NoProfile -File "./run.cmd"\' -Verb RunAs',
+        `Start-Process Powershell -Argumentlist \'-ExecutionPolicy Bypass -NoProfile -File "c:/actions-runner/${i}/run.cmd"\' -Verb RunAs`,
         'cd ..',
       );
     }
