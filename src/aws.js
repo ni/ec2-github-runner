@@ -33,7 +33,6 @@ function buildUserDataScript(githubRegistrationToken, label, instance) {
   else if (config.input.ec2BaseOs === 'linux-x64' || config.input.ec2BaseOs === 'linux-arm' || config.input.ec2BaseOs === 'linux-arm64'){
     userData.push(
       '#!/bin/bash',
-      'usermod -a -G wheel ec2-user',
       'mkdir actions-runner && cd actions-runner',
       `curl -O -L https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
       'export RUNNER_ALLOW_RUNASROOT=1',
@@ -46,7 +45,7 @@ function buildUserDataScript(githubRegistrationToken, label, instance) {
         `tar xzf ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
         `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${instance}-${i} --token ${githubRegistrationToken} --labels ${label}`,
         'chmod -R 777 /actions-runner/${i}', 
-        'su ec2-user -c \'./run.sh &\'',
+        'runuser -u ec2-user -c \'./run.sh &\'',
         'cd ..',
       );
     }
