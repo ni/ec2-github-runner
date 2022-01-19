@@ -11,13 +11,13 @@ function buildUserDataScript(githubRegistrationToken, label, instance) {
   if (config.input.ec2BaseOs === 'win-x64') {
     userData.push(
       '<powershell>',
-      'mkdir c:/actions-runner; cd c:/actions-runner',
+      'New-Item c:/actions-runner -ItemType Directory -ea 0; cd c:/actions-runner',
       `Invoke-WebRequest -Uri https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.zip -OutFile actions-runner-win-x64-${runnerVersion}.zip`,
     );
     
     for (let i = 1; i <= parseInt(config.input.numberOfRunners); i++) {
       userData.push(
-        `mkdir ${i}; cd ${i}`,
+        `New-Item ${i} -ItemType Directory -ea 0; cd ${i}`,
         `Expand-Archive -Path ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.zip -DestinationPath $PWD`,
         'mkdir _work',
         `./config.cmd --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${instance}-${i} --token ${githubRegistrationToken} --labels ${label} --unattended`,
@@ -33,7 +33,7 @@ function buildUserDataScript(githubRegistrationToken, label, instance) {
   else if (config.input.ec2BaseOs === 'linux-x64' || config.input.ec2BaseOs === 'linux-arm' || config.input.ec2BaseOs === 'linux-arm64'){
     userData.push(
       '#!/bin/bash',
-      'mkdir actions-runner && cd actions-runner',
+      'mkdir -p actions-runner && cd actions-runner',
       `curl -O -L https://github.com/actions/runner/releases/download/v${runnerVersion}/actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
       'export RUNNER_ALLOW_RUNASROOT=1',
       'export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1',
@@ -41,7 +41,7 @@ function buildUserDataScript(githubRegistrationToken, label, instance) {
 
     for (let i = 1; i <= parseInt(config.input.numberOfRunners); i++) {
       userData.push(
-        `mkdir ${i} && cd ${i}`,
+        `mkdir -p ${i} && cd ${i}`,
         `tar xzf ./../actions-runner-${config.input.ec2BaseOs}-${runnerVersion}.tar.gz`,
         `./config.sh --url https://github.com/${config.githubContext.owner}/${config.githubContext.repo} --name ${config.input.ec2BaseOs}-${label}-${instance}-${i} --token ${githubRegistrationToken} --labels ${label}`,
         './run.sh &',
